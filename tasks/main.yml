@@ -1,0 +1,28 @@
+---
+- name: Disable swap
+  lineinfile:
+    dest: /etc/fstab
+    regexp: '^/[\S]+\s+none\s+swap '
+    state: absent
+
+- name: Swap Off
+  command: swapoff --all
+  ignore_errors: yes
+
+- name: Ensure Kernel setting for net.bridge.bridge-nf-call-iptables
+  sysctl:
+    name: net.bridge.bridge-nf-call-iptables
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+    ignoreerrors: yes
+
+- include: centos.yml
+  when: ansible_os_family == 'RedHat' 
+
+- include: ubuntu.yml
+  when: ansible_os_family == 'Ubuntu'
+
+- include: common.yml
+
